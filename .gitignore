@@ -4,9 +4,6 @@ dist
 .sass-cache
 bower_components
 *.log
-JiraNasir.log
 .vscode
 Todo.txt
-*.xml
-*.json
 

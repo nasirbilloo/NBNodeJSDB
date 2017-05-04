@@ -1,0 +1,28 @@
+{
+  "name": "@nasirb/nbnodejsdb",
+  "version": "0.3.0",
+  "description": "Node JS DB classes for Nasir",
+  "main": "index.js",
+  "scripts": {
+    "test": "printMsg"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nasirbilloo/NBNodeJSDB.git"
+  },
+  "keywords": [
+    "Nasir",
+    "Billoo",
+    "Nasir Billoo"
+  ],
+  "author": "Nasir Billoo <nasir.billoo@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/nasirbilloo/NBNodeJSDB/issues"
+  },
+  "homepage": "https://github.com/nasirbilloo/NBNodeJSDB#readme",
+  "dependencies": {
+    "mysql": "*",
+    "mssql": "*"
+  },
+  "license": "ISC"
+}
