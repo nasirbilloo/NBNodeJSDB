@@ -4,9 +4,9 @@
 
 
 var GenericSimpleModel = function (table, debug) {
-    this.strTable = table;
+    //this.strTable = table;
     this.debug = debug;
-    this.Table = null;
+    this.Table = table;
     this.retID = false;
     var self = this;
 };

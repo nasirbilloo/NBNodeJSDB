@@ -1,3 +1,13 @@
+'use strict';
+
+var MySQLConnection = require('./MySQLConnection');
+var MySQLTable2 = require('./MySQLTable2');
+var MySQLQuery = require('./MySQLQuery');
+var SQLServerConnection = require('./SQLServerConnection');
+var SQLServerTable2 = require('./SQLServerTable2');
+var SQLServerQuery = require('./SQLServerQuery');
+var GenericSimpleModel = require('./GenericSimpleModel');
+
 var DBConnectionFactory = function (connObj) {
     this.DBTypes = {
         MySQL: "MySQL",
@@ -11,55 +21,77 @@ DBConnectionFactory.prototype = {
     setConnectionParameters: function (connObj) {
         this.connObj = connObj;
     },
-    setSQLConverter: function(converter){
+    setSQLConverter: function (converter) {
         this.sqlConverter = converter;
     },
-    getConnectionParameters: function(){
+    getConnectionParameters: function () {
         return this.connObj;
     },
-    getSQLConverter: function(){
+    getSQLConverter: function () {
         return this.sqlConverter;
     },
     initConnection: function (cb) {
         var self = this;
-        if (connObj.DBTYPE = this.DBTYpes.MySQL) {
-            self.dbConn = new MySQLConnection(self.connObj);
-            return cb(null, self.dbConn.getConnection());
-        } else if (connObj.DBTYPE = this.DBTYpes.SQLServer) {
-            self.dbConn = new SQLServerConnection(self.connObj);
-            return cb(null, self.dbConn.getConnection());
-        } else {
-            return cb("Invalid DB Type")
-        }
-    },
-    getConnection: function (cb) {
-        if (!connObj) {
+        if (!self.connObj) {
             return cb("Invalid Connection Parameters");
         } else {
-            if (dbConn) {
-                return cb(null, dbConn);
+            if (self.connObj.DBTYPE == self.DBTypes.MySQL) {
+                self.dbConn = new MySQLConnection(self.connObj);
+                return self.dbConn.getConnection(cb);
+            } else if (self.connObj.DBTYPE == self.DBTypes.SQLServer) {
+                self.dbConn = new SQLServerConnection(self.connObj);
+                return self.dbConn.getConnection(cb);
             } else {
-                return initConnection(cb);
+                return cb("Invalid DB Type")
             }
         }
     },
-    releaseConnection: function(cb){
-        if (connObj.DBTYPE = this.DBTYpes.MySQL) {
-            self.dbConn.release();
-        } else if (connObj.DBTYPE = this.DBTYpes.SQLServer) {
-            self.dbConn.release();
-        }         
+    getConnection: function (cb) {
+        var self = this;
+        if (!self.connObj) {
+            return cb("Invalid Connection Parameters");
+        } else {
+            if (self.dbConn) {
+                if (self.connObj.DBTYPE == self.DBTypes.MySQL) {                
+                    return self.dbConn.getConnection(cb);
+                } if (self.connObj.DBTYPE == self.DBTypes.SQLServer) {
+                    return cb(null, self.dbConn);
+                }else{
+                    return cb("Invalid DB Type")
+                }
+            } else {
+                return self.initConnection(cb);
+            }
+        }
+    },
+    releaseConnection: function (cb) {
+        var self = this;
+        if (!self.dbConn) {
+            return cb("Invalid Connection");
+        } else {
+            if (self.connObj.DBTYPE == self.DBTypes.MySQL) {
+                self.dbConn.release();
+            } else if (self.connObj.DBTYPE == self.DBTypes.SQLServer) {
+                self.dbConn.release();
+            }
+        }
     },
     getSQLTable: function (tableName, idFields, cb) {
         var self = this;
         var table = null;
-        if (!connObj) {
-            return cb("Invalid Connection Parameters");
+        if (!self.dbConn) {
+            return cb("Invalid Connection");
         } else {
-            if (connObj.DBTYPE = this.DBTYpes.MySQL) {
-                table = new MYSQLTable2(tableName, idFields, self.dbConn);
-                return cb(null, table);
-            } else if (connObj.DBTYPE = this.DBTYpes.SQLServer) {
+            if (self.connObj.DBTYPE == self.DBTypes.MySQL) {
+                self.dbConn.getConnection(function(err, conn){
+                    if (err){
+                        return cb(err);
+                    }else{
+                        table = new MySQLTable2(tableName, idFields, conn);
+                        return cb(null, table);                        
+                    }
+                });
+            } else if (self.connObj.DBTYPE == self.DBTypes.SQLServer) {
                 table = new SQLServerTable2(tableName, idFields, self.dbConn);
                 return cb(null, table);
             } else {
@@ -67,41 +99,47 @@ DBConnectionFactory.prototype = {
             }
         }
     },
-    getSQLQuery: function(cb){
+    getSQLQuery: function (cb) {
         var self = this;
         var query = null;
-        if (!connObj) {
-            return cb("Invalid Connection Parameters");
+        if (!self.dbConn) {
+            return cb("Invalid Connection");
         } else {
-            if (connObj.DBTYPE = this.DBTYpes.MySQL) {
-                query = new MYSQLQuery(self.dbConn);
-                return cb(null, query);
-            } else if (connObj.DBTYPE = this.DBTYpes.SQLServer) {
+            if (self.connObj.DBTYPE == self.DBTypes.MySQL) {
+                self.dbConn.getConnection(function(err, conn){
+                    if (err){
+                        return cb(err);
+                    }else{                
+                        query = new MySQLQuery(conn);
+                        return cb(null, query);
+                    }
+                });
+            } else if (self.connObj.DBTYPE == self.DBTypes.SQLServer) {
                 query = new SQLServerQuery(self.dbConn);
                 return cb(null, query);
             } else {
                 return cb("Invalid DB Type")
             }
-        }        
-    }, 
-    getSQLModel: function(tableName, idFields, cb){
+        }
+    },
+    getSQLModel: function (tableName, idFields, cb) {
         var self = this;
         var model = null;
-        if (!connObj) {
-            return cb("Invalid Connection Parameters");
+        if (!self.dbConn) {
+            return cb("Invalid Connection");
         } else {
-            self.getSQLTable(tableName, idFields, function(err, table){
-                if (err){
+            self.getSQLTable(tableName, idFields, function (err, table) {
+                if (err) {
                     return cb(err);
-                }else{
+                } else {
                     var model = new GenericSimpleModel(table);
-                    return cb(null, model);                   
+                    return cb(null, model);
                 }
-            });            
+            });
         }
     }
 };
 
-dbConnFactory = new DBConnectionFactory();
+var dbConnFactory = new DBConnectionFactory();
 
 module.exports = dbConnFactory;

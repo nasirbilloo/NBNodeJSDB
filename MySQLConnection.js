@@ -26,4 +26,4 @@ MySQLConnection.prototype = {
     },
 }
 
-module.exports = mySQLConnection;
+module.exports = MySQLConnection;
