@@ -2,7 +2,7 @@
 var sql = require('mssql');
 
 var SQLServerTable = function(connection, strTable){
-    this.table = strTable;
+    this.tableName = strTable;
     this.connection = connection;
 };
 
@@ -16,7 +16,7 @@ SQLServerTable.prototype = {
                 return cb("invalid Connection Error");
             }
         }
-        var strSQL = "select * from " + self.table;
+        var strSQL = "select * from " + self.tableName;
         self.runQuery(strSQL, cb);
     },
     find: function(object, cb){
@@ -32,7 +32,7 @@ SQLServerTable.prototype = {
             }
         }
 
-        var strSQL = "select * from " + self.table ;
+        var strSQL = "select * from " + self.tableName ;
         var x = 0;
         for (var key in object){
             if (x++ > 0){
@@ -55,7 +55,7 @@ SQLServerTable.prototype = {
         }
         if (!obj['id'])
             return cb(null, null);
-        var strSQL = "select * from " + self.table + " where id=" + obj['id'];
+        var strSQL = "select * from " + self.tableName + " where id=" + obj['id'];
         self.runQuery(strSQL, cb);
     },
     insert: function(object,cb){
@@ -68,7 +68,7 @@ SQLServerTable.prototype = {
             }
         }
 
-        var strSQL = "insert into " + self.table + " (";
+        var strSQL = "insert into " + self.tableName + " (";
         var x =0;
         for (var key in object){
             if (x++ > 0){
@@ -102,7 +102,7 @@ SQLServerTable.prototype = {
             }
         }
 
-        var strSQL = "update " + self.table + " set ";
+        var strSQL = "update " + self.tableName + " set ";
         var x = 0;
         for (var key in object)
         {
@@ -131,7 +131,7 @@ SQLServerTable.prototype = {
         }
 
         var x = 0;
-        var strSQL = "update " + self.table + " set ";
+        var strSQL = "update " + self.tableName + " set ";
         for (var key in originalObj){
             if (key == "id"){continue;}
             if (originalObj[key] && newObj[key]){
@@ -172,7 +172,7 @@ SQLServerTable.prototype = {
             }
         }
 
-        var strSQL = "delete from " + self.table;
+        var strSQL = "delete from " + self.tableName;
         var x = 0;
         strSQL += " where ";
         strSQL += " id = " + object['id'] + " ";
@@ -188,7 +188,7 @@ SQLServerTable.prototype = {
             }
         }
 
-        var strSQL = "select count(*) nasir from " + self.table ;
+        var strSQL = "select count(*) nasir from " + self.tableName ;
         var x = 0;
         for (var key in object){
             if (x++ > 0){
@@ -235,7 +235,7 @@ SQLServerTable.prototype = {
             }
         }
 
-        var strSQL = "select name from " + self.table + " where id=" + obj['id'];
+        var strSQL = "select name from " + self.tableName + " where id=" + obj['id'];
         self.runQuery(strSQL, cb);
     },
     runQuery: function(sqlstring,cb){

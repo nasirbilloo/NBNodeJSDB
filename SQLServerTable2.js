@@ -3,7 +3,7 @@
 var sql = require('mssql');
 
 var SQLServerTable2 = function (strTable, idFields, dbConn) {
-    this.table = strTable;
+    this.tableName = strTable;
     this.userID = 'SYS';
     idFields ? this.idFields = idFields : this.idFields = ['id']; //Array
     this.dbConn = dbConn;
@@ -25,7 +25,7 @@ SQLServerTable2.prototype = {
     },
     findAll: function (cb) {
         var self = this;
-        var strSQL = "select * from " + self.table;
+        var strSQL = "select * from " + self.tableName;
         self.runQuery(strSQL, cb);
     },
     find: function (object, cb) {
@@ -35,7 +35,7 @@ SQLServerTable2.prototype = {
         var self = this;
 
 
-        var strSQL = "select * from " + self.table;
+        var strSQL = "select * from " + self.tableName;
         var x = 0;
         for (var key in object) {
             if (x++ > 0) {
@@ -54,7 +54,7 @@ SQLServerTable2.prototype = {
             if (err) {
                 return cb("Primary Key can't be null");
             } else {
-                var strSQL = "select * from " + self.table + " where " + self.getIdWhereClause(obj);
+                var strSQL = "select * from " + self.tableName + " where " + self.getIdWhereClause(obj);
                 self.runQuery(strSQL, cb);
 
             }
@@ -64,7 +64,7 @@ SQLServerTable2.prototype = {
     insert: function (object, cb) {
         var self = this;
 
-        var strSQL = "insert into " + self.table + " (";
+        var strSQL = "insert into " + self.tableName + " (";
         var x = 0;
         for (var key in object) {
             if (x++ > 0) {
@@ -116,7 +116,7 @@ SQLServerTable2.prototype = {
     update: function (object, cb) {
         var self = this;
 
-        var strSQL = "update " + self.table + " set ";
+        var strSQL = "update " + self.tableName + " set ";
         var x = 0;
         for (var key in object) {
             if (self.isIdField(key)) {
@@ -139,7 +139,7 @@ SQLServerTable2.prototype = {
         var self = this;
 
         var x = 0;
-        var strSQL = "update " + self.table + " set ";
+        var strSQL = "update " + self.tableName + " set ";
         //var tempObj = self.mergeObjects(originalObj, newObj);
 
         for (var key in originalObj) {
@@ -149,7 +149,7 @@ SQLServerTable2.prototype = {
             //DON'T JUDGE ME
             //I must have done this in my lowest, most vulnerable state
             //Seriously, don't judge me.
-            if (self.table.toLowerCase() == "people") {
+            if (self.tableName.toLowerCase() == "people") {
                 if (key.toLowerCase() == "departmentid" || key.toLowerCase() == "manager" || key.toLowerCase() == "authorized") {
                     continue;
                 }
@@ -193,7 +193,7 @@ SQLServerTable2.prototype = {
     remove: function (object, cb) {
         var self = this;
 
-        var strSQL = "delete from " + self.table;
+        var strSQL = "delete from " + self.tableName;
         var x = 0;
         strSQL += " where ";
         strSQL += self.getIdWhereClause(object)
@@ -202,7 +202,7 @@ SQLServerTable2.prototype = {
     count: function (object, cb) {
         var self = this;
 
-        var strSQL = "select count(*) nasir from " + self.table;
+        var strSQL = "select count(*) nasir from " + self.tableName;
         var x = 0;
         for (var key in object) {
             if (x++ > 0) {
@@ -275,7 +275,7 @@ SQLServerTable2.prototype = {
     getName: function (obj, cb) {
         var self = this;
 
-        var strSQL = "select name from " + self.table + " where " + self.getIdWhereClause(obj)
+        var strSQL = "select name from " + self.tableName + " where " + self.getIdWhereClause(obj)
         self.runQuery(strSQL, cb);
     },
     runQuery: function (sqlstring, cb) {

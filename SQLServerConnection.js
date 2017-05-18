@@ -25,9 +25,8 @@ var SQLConnection = function (ConnObj) {
 SQLConnection.prototype = {
         connect: function (cb, count) {
             if (!count) count = 0;
-            //console.log("Count: " + count);
             var self = this;
-            if (!self.connection) {
+            if (!self.connection || !self.connection.connected) {
                 self.connected = false;
                 var config = this.dbConfig;
                 self.connection = new sql.Connection(config, function (err) {
@@ -79,6 +78,8 @@ SQLConnection.prototype = {
         execute: function (procname, cb) {
             if (!this.connection) {
                 return cb("Invalid Connection");
+            } else if (!this.connection.connected){
+                return cb("Connection is not open");
             } else {
                 var request = new sql.Request(this.connection);
                 //request.input('retident', 1);
@@ -92,6 +93,8 @@ SQLConnection.prototype = {
             var self = this;
             if (!this.connection) {
                 return cb("Invalid Connection");
+            } else if (!this.connection.connected){
+                return cb("Connection is not open");
             } else {
                 try{
                 var request = new sql.Request(this.connection);

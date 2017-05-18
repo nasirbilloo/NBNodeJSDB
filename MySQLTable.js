@@ -2,7 +2,7 @@
 var sql = require('mysql');
 
 var MySQLTable = function(connection, strTable){
-    this.table = strTable;
+    this.tableName = strTable;
     this.connection = connection;
     this.userID = "SYS";
 };
@@ -17,7 +17,7 @@ MySQLTable.prototype = {
                 return cb("invalid Connection Error");
             }
         }
-        var strSQL = "select * from " + self.table;
+        var strSQL = "select * from " + self.tableName;
         self.runQuery(strSQL, cb);
     },
     find: function(object, cb){
@@ -33,7 +33,7 @@ MySQLTable.prototype = {
             }
         }
 
-        var strSQL = "select * from " + self.table ;
+        var strSQL = "select * from " + self.tableName ;
         var x = 0;
         for (var key in object){
             if (x++ > 0){
@@ -56,7 +56,7 @@ MySQLTable.prototype = {
         }
         if (!obj['id'])
             return cb(null, null);
-        var strSQL = "select * from " + self.table + " where id=" + obj['id'];
+        var strSQL = "select * from " + self.tableName + " where id=" + obj['id'];
         self.runQuery(strSQL, cb);
     },
     insert: function(object,cb){
@@ -69,7 +69,7 @@ MySQLTable.prototype = {
             }
         }
 
-        var strSQL = "insert into " + self.table + " (";
+        var strSQL = "insert into " + self.tableName + " (";
         var x =0;
         for (var key in object){
             if (x++ > 0){
@@ -103,7 +103,7 @@ MySQLTable.prototype = {
             }
         }
 
-        var strSQL = "update " + self.table + " set ";
+        var strSQL = "update " + self.tableName + " set ";
         var x = 0;
         for (var key in object)
         {
@@ -135,7 +135,7 @@ MySQLTable.prototype = {
             }
         }
         var x = 0;
-        var strSQL = "update " + self.table + " set ";
+        var strSQL = "update " + self.tableName + " set ";
         for (var key in originalObj){
             if (key.toLowerCase() == "id" 
             || key.toLowerCase() == "createdon" 
@@ -178,7 +178,7 @@ MySQLTable.prototype = {
             }
         }
 
-        var strSQL = "delete from " + self.table;
+        var strSQL = "delete from " + self.tableName;
         var x = 0;
         strSQL += " where ";
         strSQL += " id = " + object['id'] + " ";
@@ -194,7 +194,7 @@ MySQLTable.prototype = {
             }
         }
 
-        var strSQL = "select count(*) nasir from " + self.table ;
+        var strSQL = "select count(*) nasir from " + self.tableName ;
         var x = 0;
         for (var key in object){
             if (x++ > 0){
@@ -241,7 +241,7 @@ MySQLTable.prototype = {
             }
         }
 
-        var strSQL = "select name from " + self.table + " where id=" + obj['id'];
+        var strSQL = "select name from " + self.tableName + " where id=" + obj['id'];
         self.runQuery(strSQL, cb);
     },
     runQuery: function(sqlstring,cb){

@@ -7,6 +7,7 @@ var GenericSimpleModel = function (table, debug) {
     //this.strTable = table;
     this.debug = debug;
     this.Table = table;
+    this.tableName = table.tableName;
     this.retID = false;
     var self = this;
 };
@@ -15,7 +16,7 @@ GenericSimpleModel.prototype = {
     setDebug: function (debug) {
         this.debug = true;
         this.Table.debug = this.debug;
-        console.log("TABLE DEBUG: " + this.Table.debug + " " + this.Table.table);
+        console.log("TABLE DEBUG: " + this.Table.debug + " " + this.Table.tableName);
     },
     setRetID: function (retID) {
         this.retID = retID;
@@ -79,7 +80,7 @@ GenericSimpleModel.prototype = {
     },
     getIDCol: function (cb) { //Don't Need to do that for MySQL
         var self = this;
-        var strSQL = "SELECT max(id) as insertId from " + self.Table.table;
+        var strSQL = "SELECT max(id) as insertId from " + self.Table.tableName;
         DBConnectionFactory.getSQLQuery(function(err, issueQuery){
             if (err){
                 return cb(err);
