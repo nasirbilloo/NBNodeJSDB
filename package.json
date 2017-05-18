@@ -22,7 +22,7 @@
   "homepage": "https://github.com/nasirbilloo/NBNodeJSDB#readme",
   "dependencies": {
     "mysql": "*",
-    "mssql": "^3.3.x"
+    "mssql": "*"
   },
   "license": "ISC"
 }
