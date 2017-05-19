@@ -1,6 +1,6 @@
 {
   "name": "@nasirb/nbnodejsdb",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Node JS DB classes for Nasir",
   "main": "index.js",
   "scripts": {
