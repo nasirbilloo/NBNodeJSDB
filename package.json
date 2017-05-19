@@ -21,8 +21,8 @@
   },
   "homepage": "https://github.com/nasirbilloo/NBNodeJSDB#readme",
   "dependencies": {
-    "mysql": "3.x",
-    "mssql": "*"
+    "mysql": "*",
+    "mssql": "3.x"
   },
   "license": "ISC"
 }
