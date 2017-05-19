@@ -281,7 +281,7 @@ SQLServerTable2.prototype = {
     runQuery: function (sqlstring, cb) {
         var self = this;
 
-        if (!self.dbConn || !self.dbConn.connection) {
+        if (!self.dbConn || !self.dbConn) {
             if (!cb) {
                 return ("Invalid Connection");
             } else {
@@ -307,7 +307,7 @@ SQLServerTable2.prototype = {
     runCUDQuery: function (sqlstring, cb) {
         var self = this;
 
-        if (!self.dbConn && self.dbConn.connection) {
+        if (!self.dbConn) {
             if (!cb) {
                 return ("Invalid Connection");
             } else {
