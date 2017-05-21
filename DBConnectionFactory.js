@@ -18,13 +18,13 @@ var DBConnectionFactory = function (connObj) {
     this.sqlConverter = null;
 }
 DBConnectionFactory.prototype = {
-    setConnectionParameters: function (connObj) {
+    setConnectionParameters: function (connObj, cb) {
         this.connObj = connObj;
-        this.initConnectionPool(function (err, result) {
+        this.initConnectionPool(function (err, conn) {
             if (err) {
-                throw (err);
+                return cb(err);
             } else {
-                return;
+                return cb(null, conn);
             }
         })
     },
@@ -45,11 +45,17 @@ DBConnectionFactory.prototype = {
             if (self.connObj.DBTYPE == self.DBTypes.MySQL) {
                 self.dbConn = new MySQLConnection(self.connObj);
                 self.dbConn.initPool(function (err, result) {
+                    if (err){
+                        return cb(err);
+                    }
                     return self.dbConn.getConnection(cb);
                 })
             } else if (self.connObj.DBTYPE == self.DBTypes.SQLServer) {
                 self.dbConn = new SQLServerConnection(self.connObj);
                 self.dbConn.initPool(function (err, result) {
+                    if (err){
+                        return cb(err);
+                    }
                     return self.dbConn.getConnection(cb);
                 });
             } else {

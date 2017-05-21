@@ -2,7 +2,6 @@
 var sql = require('mysql');
 
 var MySQLQuery = function (connection) {
-    //    logger.log("In Projects constructor");
     this.connection = connection;
 };
 
@@ -29,7 +28,6 @@ MySQLQuery.prototype = {
         }
         this.connection.query(sqlstring, function (err, rows, fields) {
             if (err) {
-                if (logger) logger.error("MySQLQuery.query: " + err);
                 return cb(err + "\n SQL Statement: " + sqlstring);
             }
             return cb(null, rows);
