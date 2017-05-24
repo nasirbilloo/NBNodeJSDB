@@ -7,13 +7,16 @@ var SQLServerTable2 = function (strTable, idFields, dbConn) {
     this.userID = 'SYS';
     idFields ? this.idFields = idFields : this.idFields = ['id']; //Array
     this.dbConn = dbConn;
+    this.debug = false;
 };
 
 SQLServerTable2.prototype = {
     setConnection: function(conn){
+        if (this.debug) console.log("In SQLServerTable2: setConnection");
         this.dbConn = conn;
     },
     getIdWhereClause: function (data) {
+        if (this.debug) console.log("In SQLServerTable2: getIdWhereClause");        
         var ret = "";
         var count = 0;
         this.idFields.forEach(function (item) {
@@ -24,17 +27,18 @@ SQLServerTable2.prototype = {
         return ret;
     },
     findAll: function (cb) {
+        if (this.debug) console.log("In SQLServerTable2: findAll");        
         var self = this;
         var strSQL = "select * from " + self.tableName;
         self.runQuery(strSQL, cb);
     },
     find: function (object, cb) {
+        if (this.debug) console.log("In SQLServerTable2: find");        
         return this.findFew(object, cb);
     },
     findFew: function (object, cb) {
+        if (this.debug) console.log("In SQLServerTable2: findFew");        
         var self = this;
-
-
         var strSQL = "select * from " + self.tableName;
         var x = 0;
         for (var key in object) {
@@ -48,6 +52,7 @@ SQLServerTable2.prototype = {
         self.runQuery(strSQL, cb);
     },
     findOne: function (obj, cb) {
+        if (this.debug) console.log("In SQLServerTable2: findOne");        
         var self = this;
 
         self.isNullIdField(obj, function (err, isNull) {
@@ -62,6 +67,7 @@ SQLServerTable2.prototype = {
 
     },
     insert: function (object, cb) {
+        if (this.debug) console.log("In SQLServerTable2: insert");        
         var self = this;
 
         var strSQL = "insert into " + self.tableName + " (";
@@ -97,13 +103,14 @@ SQLServerTable2.prototype = {
         self.runCUDQuery(strSQL, cb);
     },
     isIdField: function (key) {
-
+        if (this.debug) console.log("In SQLServerTable2: isIdField");
         if (this.idFields.indexOf(key) > -1) return true;
         return false;
 
         //return false;
     },
     mergeObjects: function (obj1, obj2) {
+        if (this.debug) console.log("In SQLServerTable2: mergeObjects");        
         var obj3 = {};
         for (var attrname in obj1) {
             obj3[attrname] = obj1[attrname];
@@ -114,6 +121,7 @@ SQLServerTable2.prototype = {
         return obj3;
     },
     update: function (object, cb) {
+        if (this.debug) console.log("In SQLServerTable2: update");        
         var self = this;
 
         var strSQL = "update " + self.tableName + " set ";
@@ -136,6 +144,7 @@ SQLServerTable2.prototype = {
         self.runCUDQuery(strSQL, cb);
     },
     updateWithCompare: function (originalObj, newObj, cb) {
+        if (this.debug) console.log("In SQLServerTable2: updateWithCompare");        
         var self = this;
 
         var x = 0;
@@ -191,6 +200,7 @@ SQLServerTable2.prototype = {
         }
     },
     remove: function (object, cb) {
+        if (this.debug) console.log("In SQLServerTable2: remove");        
         var self = this;
 
         var strSQL = "delete from " + self.tableName;
@@ -200,6 +210,7 @@ SQLServerTable2.prototype = {
         self.runCUDQuery(strSQL, cb);
     },
     count: function (object, cb) {
+        if (this.debug) console.log("In SQLServerTable2: count");        
         var self = this;
 
         var strSQL = "select count(*) nasir from " + self.tableName;
@@ -215,6 +226,7 @@ SQLServerTable2.prototype = {
         self.runQuery(strSQL, cb);
     },
     getIdObject: function (obj) {
+        if (this.debug) console.log("In SQLServerTable2: getIdObject");        
         var retObj = {};
         this.idFields.forEach(function (idField) {
             retObj[idField] = obj[idField]
@@ -222,6 +234,7 @@ SQLServerTable2.prototype = {
         return retObj;
     },
     getIdObjectWithOperators: function (obj) {
+        if (this.debug) console.log("In SQLServerTable2: getIdObjectWithOperators");        
         var retObj = {};
         this.idFields.forEach(function (idField) {
             retObj[idField] = "='" + obj[idField] + "'";
@@ -229,6 +242,7 @@ SQLServerTable2.prototype = {
         return retObj;
     },
     isNullIdField: function (obj, cb) {
+        if (this.debug) console.log("In SQLServerTable2: isNullIdField");        
         var self = this;
         if (!obj) return true;
         var count = 0;
@@ -249,6 +263,7 @@ SQLServerTable2.prototype = {
         });
     },
     exists: function (object, cb) {
+        if (this.debug) console.log("In SQLServerTable2: exists");        
         var self = this;
 
         if (!object) {
@@ -260,7 +275,7 @@ SQLServerTable2.prototype = {
                     if (err) {
                         return cb(err, null);
                     } else {
-                        if (result[0]['nasir'] > 0) {
+                        if (result && result.length && result.length > 0 && result[0]['nasir'] > 0) {
                             return cb(null, true);
                         } else {
                             return cb(null, false);
@@ -273,14 +288,16 @@ SQLServerTable2.prototype = {
         });
     },
     getName: function (obj, cb) {
+        if (this.debug) console.log("In SQLServerTable2: getName");        
         var self = this;
 
         var strSQL = "select name from " + self.tableName + " where " + self.getIdWhereClause(obj)
         self.runQuery(strSQL, cb);
     },
     runQuery: function (sqlstring, cb) {
+        if (this.debug) console.log("In SQLServerTable2: runQuery");        
         var self = this;
-
+        
         if (!self.dbConn || !self.dbConn) {
             if (!cb) {
                 return ("Invalid Connection");
@@ -288,7 +305,9 @@ SQLServerTable2.prototype = {
                 return cb("invalid connection Error");
             }
         }
-        self.dbConn.query(sqlstring, function (err, recordset) {
+        if (this.debug) console.log("In SQLServerTable2: Going in for a query");
+        self.dbConn.query(sqlstring, function (err, recordset) {                
+            if (self.debug) console.log("In SQLServerTable2: coming out of a query");                    
             if (err) {
                 var n = String(err).indexOf("Error Establishing Connection");
                 var m = String(err).indexOf("Failed to connect");
@@ -305,6 +324,7 @@ SQLServerTable2.prototype = {
         });
     },
     runCUDQuery: function (sqlstring, cb) {
+        if (this.debug) console.log("In SQLServerTable2: runCUDQuery");        
         var self = this;
 
         if (!self.dbConn) {

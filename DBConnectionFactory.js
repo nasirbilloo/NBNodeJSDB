@@ -16,9 +16,11 @@ var DBConnectionFactory = function (connObj) {
     this.connObj = connObj;
     this.dbConn = null;
     this.sqlConverter = null;
+    this.debug = false;
 }
 DBConnectionFactory.prototype = {
     setConnectionParameters: function (connObj, cb) {
+        if (this.debug) console.log("In DBConnectionFactory: setConnectionParameters");
         this.connObj = connObj;
         this.initConnectionPool(function (err, conn) {
             if (err) {
@@ -29,15 +31,19 @@ DBConnectionFactory.prototype = {
         })
     },
     setSQLConverter: function (converter) {
+        if (this.debug) console.log("In DBConnectionFactory: setSQLConverter");        
         this.sqlConverter = converter;
     },
     getConnectionParameters: function () {
+        if (this.debug) console.log("In DBConnectionFactory: getConnectionParameters");        
         return this.connObj;
     },
     getSQLConverter: function () {
+        if (this.debug) console.log("In DBConnectionFactory: getSQLConverter");        
         return this.sqlConverter;
     },
     initConnectionPool: function (cb) {
+        if (this.debug) console.log("In DBConnectionFactory: initConnectionPool");        
         var self = this;
         if (!self.connObj) {
             return cb("DBConnectionFactory - initConnectionPool: \nInvalid Connection Parameters");
@@ -64,6 +70,7 @@ DBConnectionFactory.prototype = {
         }
     },
     getConnection: function (cb) {
+        if (this.debug) console.log("In DBConnectionFactory: getConnection");        
         var self = this;
         if (!self.connObj) {
             return cb("DBConnectionFactory - getConnection: \nInvalid Connection Parameters");
@@ -76,6 +83,7 @@ DBConnectionFactory.prototype = {
         }
     },
     releaseConnection: function (cb) {
+        if (this.debug) console.log("In DBConnectionFactory: releaseConnection");        
         var self = this;
         if (!self.dbConn) {
             return cb("DBConnectionFactory - releaseConnection: \nInvalid Connection");
@@ -86,6 +94,7 @@ DBConnectionFactory.prototype = {
         }
     },
     getSQLTable: function (tableName, idFields, cb) {
+        if (this.debug) console.log("In DBConnectionFactory: getSQLTable");        
         var self = this;
         var table = null;
         var SQLTableType = null;
@@ -110,6 +119,7 @@ DBConnectionFactory.prototype = {
         }
     },
     getSQLQuery: function (cb) {
+        if (this.debug) console.log("In DBConnectionFactory: getSQLQuery");        
         var self = this;
         var query = null;
         var SQLQueryType = null;
@@ -133,6 +143,7 @@ DBConnectionFactory.prototype = {
         }
     },
     executeSQLQuery: function (strSQL, cb) {
+        if (this.debug) console.log("In DBConnectionFactory: executeSQLQuery");        
         var self = this;
         self.getSQLQuery(function (err, myQuery) {
             if (err) {
@@ -149,6 +160,7 @@ DBConnectionFactory.prototype = {
         });
     },
     getSQLModel: function (tableName, idFields, cb) {
+        if (this.debug) console.log("In DBConnectionFactory: getSQLModel");        
         var self = this;
         var model = null;
         if (!self.dbConn) {

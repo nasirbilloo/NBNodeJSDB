@@ -3,10 +3,12 @@ var sql = require('mssql');
 
 var SQLQuery = function (connection) {
     this.connection = connection;
+    this.debug = false;
 };
 
 SQLQuery.prototype = {
     query: function (strSQL, cb) {
+        if (this.debug) console.log("In SQLServerQuery: query");
         var self = this;
         if (!this.connection) {
             if (!cb) {
@@ -18,6 +20,7 @@ SQLQuery.prototype = {
         self.runQuery(strSQL, cb);
     },
     runQuery: function (sqlstring, cb) {
+        if (this.debug) console.log("In SQLServerQuery: runQuery");        
         var self = this;
         if (!self.connection) {
             return cb("invalid connection Error");
