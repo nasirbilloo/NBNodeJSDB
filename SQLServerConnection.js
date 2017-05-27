@@ -72,7 +72,7 @@ SQLConnection.prototype = {
                 if (err) {
                     return cb(err);
                 }
-                return cb(null, result);
+                return cb(null, result.recordset);
             });
         } catch (err) {
             return cb(err);
