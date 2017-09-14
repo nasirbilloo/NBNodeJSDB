@@ -66,7 +66,6 @@ SQLConnection.prototype = {
             if (self.debug) console.log("FUCK");
             return cb("FUCK");
         }
-        if (self.debug) console.log("FUCK");
         try {
             self.pool.request().query(strSQL, function (err, result) {
                 if (err) {

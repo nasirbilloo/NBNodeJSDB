@@ -151,6 +151,7 @@ DBConnectionFactory.prototype = {
             } else {
                 myQuery.query(strSQL, function (err, results) {
                     if (err) {
+                        //this.releaseConnection();
                         return cb(err);
                     } else {
                         return cb(null, results)
