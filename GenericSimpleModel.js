@@ -142,7 +142,7 @@ GenericSimpleModel.prototype = {
                     return cb(null, false);
 
                 } else { //Exists
-                    return cb(null, true);
+                    return cb(null, results);
                 }
             }
         });
