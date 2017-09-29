@@ -8,18 +8,20 @@ var GenericSimpleModel = function (table, debug) {
     this.Table = table;
     this.tableName = table.tableName;
     this.retID = false;
+    this.convertBooToInt = true;
+    this.hasCreateAndUpdate = false;    
     this.debug = false;
 };
 
 GenericSimpleModel.prototype = {
     setDebug: function (debug) {
-        if (this.debug) console.log("In GenericSimpleModel: setDebug");        
+        if (this.debug) console.log("In GenericSimpleModel: setDebug");
         this.debug = true;
         this.Table.debug = this.debug;
         console.log("TABLE DEBUG: " + this.Table.debug + " " + this.Table.tableName);
     },
     setRetID: function (retID) {
-        if (this.debug) console.log("In GenericSimpleModel: setRetID");                
+        if (this.debug) console.log("In GenericSimpleModel: setRetID");
         this.retID = retID;
     },
     getAll: function (cb) {
@@ -33,7 +35,7 @@ GenericSimpleModel.prototype = {
         });
     },
     getSome: function (obj, cb) {
-        if (this.debug) console.log("In GenericSimpleModel: getSome");        
+        if (this.debug) console.log("In GenericSimpleModel: getSome");
         var self = this;
         self.Table.findFew(obj, function (err2, results) {
             if (err2) {
@@ -43,7 +45,7 @@ GenericSimpleModel.prototype = {
         });
     },
     getWithID: function (itemID, itemIDName, cb) {
-        if (this.debug) console.log("In GenericSimpleModel: getWithID");        
+        if (this.debug) console.log("In GenericSimpleModel: getWithID");
         var self = this;
         var obj = {};
         obj[itemIDName] = "=" + itemID;
@@ -55,8 +57,23 @@ GenericSimpleModel.prototype = {
         });
     },
     simpleUpdate: function (data, cb) {
-        if (this.debug) console.log("In GenericSimpleModel: simpleUpdate");        
+        if (this.debug) console.log("In GenericSimpleModel: simpleUpdate");
         var self = this;
+        if (self.convertBooToInt) {
+            for (var x = 0; x < Object.keys(data).length; x++) {
+                var key = Object.keys(data)[x];
+                if (data[key] == true) {
+                    data[key] = 1;
+                }
+                if (data[key] == false) {
+                    data[key] = 0;
+                }
+            }
+        }
+        if (Model.hasCreateAndUpdate) {
+            data.updated_on = new Date();
+            data.updated_by = Model.user;
+        }        
         self.Table.update(data, function (err3, results) {
             if (err3) {
                 return cb(err3, null);
@@ -67,9 +84,24 @@ GenericSimpleModel.prototype = {
 
     },
     update: function (data, cb) {
-        if (this.debug) console.log("In GenericSimpleModel: update");        
+        if (this.debug) console.log("In GenericSimpleModel: update");
         var self = this;
-        self.Table.findOne(data, function (err1, results) {
+        if (self.convertBooToInt) {
+            for (var x = 0; x < Object.keys(data).length; x++) {
+                var key = Object.keys(data)[x];
+                if (data[key] == true) {
+                    data[key] = 1;
+                }
+                if (data[key] == false) {
+                    data[key] = 0;
+                }
+            }
+        }
+        if (Model.hasCreateAndUpdate) {
+            data.updated_on = new Date();
+            data.updated_by = Model.user;
+        }        
+        self.exists(data, function (err1, results) {
             if (err1 || !results || results.length < 1) {
                 return cb(err1);
             } else {
@@ -83,8 +115,34 @@ GenericSimpleModel.prototype = {
             }
         }); //FindOne
     },
+    updateWithCompare: function (oldData, newData, cb) {
+        if (this.debug) console.log("In GenericSimpleModel: update");
+        var self = this;
+        if (self.convertBooToInt) {
+            for (var x = 0; x < Object.keys(newData).length; x++) {
+                var key = Object.keys(newData)[x];
+                if (newData[key] == true) {
+                    newData[key] = 1;
+                }
+                if (newData[key] == false) {
+                    newData[key] = 0;
+                }
+            }
+        }
+        if (Model.hasCreateAndUpdate) {
+            data.updated_on = new Date();
+            data.updated_by = Model.user;
+        }        
+        self.Table.updateWithCompare(oldData, newData, function (err3, results) {
+            if (err3) {
+                return cb(err3, null);
+            } else {
+                return cb(null, results);
+            }
+        });
+    },    
     getIDCol: function (cb) { //Don't Need to do that for MySQL
-        if (this.debug) console.log("In GenericSimpleModel: getIDCol");    
+        if (this.debug) console.log("In GenericSimpleModel: getIDCol");
         var self = this;
         var strSQL = "SELECT max(id) as insertId from " + self.Table.tableName;
         DBConnectionFactory.executeSQLQuery(strSQL, function (err, results) {
@@ -98,14 +156,31 @@ GenericSimpleModel.prototype = {
         });
     },
     insert: function (data, cb) {
-        if (this.debug) console.log("In GenericSimpleModel: insert");            
+        if (this.debug) console.log("In GenericSimpleModel: insert");
         var self = this;
+        if (self.convertBooToInt) {
+            for (var x = 0; x < Object.keys(data).length; x++) {
+                var key = Object.keys(data)[x];
+                if (data[key] == true) {
+                    data[key] = 1;
+                }
+                if (data[key] == false) {
+                    data[key] = 0;
+                }
+            }
+        }
+        if (Model.hasCreateAndUpdate) {
+            data.created_on = new Date();
+            data.created_by = Model.user;
+        }
         self.Table.insert(data, function (err2, results) {
             if (err2) {
                 return cb(err2, null);
             } else {
                 if (self.retID) {
-                    return cb(null, { insertId: results.insertId });
+                    return cb(null, {
+                        insertId: results.insertId
+                    });
                 } else {
                     //logger.dir("done with insert");
                     return cb(null, results);
@@ -114,7 +189,7 @@ GenericSimpleModel.prototype = {
         });
     },
     insertOrUpdate: function (data, cb) {
-        if (this.debug) console.log("In GenericSimpleModel: insertOrUpdate");    
+        if (this.debug) console.log("In GenericSimpleModel: insertOrUpdate");
         var self = this;
         self.Table.exists(data, function (err1, results) {
             //console.log("insertOrUpdate");
@@ -125,30 +200,25 @@ GenericSimpleModel.prototype = {
                     return self.insert(data, cb);
 
                 } else { //Exists
-                    return self.update(data, cb);
+                    return self.updateWithCompare(results[0], data, cb);
                 }
             }
         });
     },
     exists: function (data, cb) {
-        if (this.debug) console.log("In GenericSimpleModel: exists");            
+        if (this.debug) console.log("In GenericSimpleModel: exists");
         var self = this;
         self.Table.exists(data, function (err1, results) {
             //console.log("insertOrUpdate");
             if (err1) { //Error in query
                 return cb(err1, null);
             } else {
-                if (!results || results.length < 1) { //Doesn't Existt
-                    return cb(null, false);
-
-                } else { //Exists
-                    return cb(null, results);
-                }
+                return cb(null, results);
             }
         });
     },
     removeSimple: function (data, cb) {
-        if (this.debug) console.log("In GenericSimpleModel: removeSimple");            
+        if (this.debug) console.log("In GenericSimpleModel: removeSimple");
         var self = this;
         self.Table.remove(data, function (err3, results) {
             if (err3) {
@@ -159,7 +229,7 @@ GenericSimpleModel.prototype = {
         });
     },
     removeIfExists: function (data, cb) {
-        if (this.debug) console.log("In GenericSimpleModel: removeIfExists");            
+        if (this.debug) console.log("In GenericSimpleModel: removeIfExists");
         var self = this;
         self.Table.exists(data, function (err1, results) {
             if (err1) { //Error in query

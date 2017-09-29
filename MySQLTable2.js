@@ -7,13 +7,16 @@ var MySQLTable2 = function (strTable, idFields, dbConn) {
     this.userID = 'SYS';
     idFields ? this.idFields = idFields : this.idFields = ['id']; //Array
     this.dbConn = dbConn;
+    this.debug = false;    
 };
 
 MySQLTable2.prototype = {
     setConnection: function(conn){
+        if (this.debug) console.log("In MySQLTable2: setConnection");
         this.dbConn = conn;
-    },    
+    },
     getIdWhereClause: function (data) {
+        if (this.debug) console.log("In MySQLTable2: getIdWhereClause");        
         var ret = "";
         var count = 0;
         this.idFields.forEach(function (item) {
@@ -24,14 +27,17 @@ MySQLTable2.prototype = {
         return ret;
     },
     findAll: function (cb) {
+        if (this.debug) console.log("In MySQLTable2: findAll");        
         var self = this;
         var strSQL = "select * from " + self.tableName;
         self.runQuery(strSQL, cb);
     },
     find: function (object, cb) {
+        if (this.debug) console.log("In MySQLTable2: find");        
         return this.findFew(object, cb);
     },
     findFew: function (object, cb) {
+        if (this.debug) console.log("In MySQLTable2: findFew");        
         var self = this;
         var strSQL = "select * from " + self.tableName;
         var x = 0;
@@ -46,6 +52,7 @@ MySQLTable2.prototype = {
         self.runQuery(strSQL, cb);
     },
     findOne: function (obj, cb) {
+        if (this.debug) console.log("In MySQLTable2: findOne");        
         var self = this;
 
         self.isNullIdField(obj, function (err, isNull) {
@@ -60,6 +67,7 @@ MySQLTable2.prototype = {
 
     },
     insert: function (object, cb) {
+        if (this.debug) console.log("In MySQLTable2: insert");        
         var self = this;
 
         var strSQL = "insert into " + self.tableName + " (";
@@ -95,13 +103,14 @@ MySQLTable2.prototype = {
         self.runCUDQuery(strSQL, cb);
     },
     isIdField: function (key) {
-
+        if (this.debug) console.log("In MySQLTable2: isIdField");
         if (this.idFields.indexOf(key) > -1) return true;
         return false;
 
         //return false;
     },
     mergeObjects: function (obj1, obj2) {
+        if (this.debug) console.log("In MySQLTable2: mergeObjects");        
         var obj3 = {};
         for (var attrname in obj1) {
             obj3[attrname] = obj1[attrname];
@@ -112,6 +121,7 @@ MySQLTable2.prototype = {
         return obj3;
     },
     update: function (object, cb) {
+        if (this.debug) console.log("In MySQLTable2: update");        
         var self = this;
 
         var strSQL = "update " + self.tableName + " set ";
@@ -133,14 +143,16 @@ MySQLTable2.prototype = {
         strSQL += " where " + self.getIdWhereClause(object);
         self.runCUDQuery(strSQL, cb);
     },
-    updateWithCompare: function (originalObj, newObj, cb) {        
+    updateWithCompare: function (originalObj, newObj, cb) {
+        if (this.debug) console.log("In MySQLTable2: updateWithCompare");        
         var self = this;
+
         var x = 0;
         var strSQL = "update " + self.tableName + " set ";
         //var tempObj = self.mergeObjects(originalObj, newObj);
 
         for (var key in originalObj) {
-            if (self.isIdField(key)) { //Nothing to do with ID Fields
+            if (self.isIdField(key)) {
                 continue;
             }
             //DON'T JUDGE ME
@@ -169,9 +181,7 @@ MySQLTable2.prototype = {
                         strSQL += key + " = '" + newObj[key] + "' ";
                     }
                 }
-            } else if (!originalObj[key] && !newObj[key]){ //if neither exists then bail
-                continue;
-            }else { // One of them is null
+            } else { // One of them is null
                 if (x++ > 0) {
                     strSQL += ",";
                 }
@@ -182,7 +192,6 @@ MySQLTable2.prototype = {
                 }
             }
         }
-
         strSQL += " where " + self.getIdWhereClause(originalObj);
         if (x < 1) { //Nothing to update, bailing
             return cb(null, originalObj);
@@ -191,6 +200,7 @@ MySQLTable2.prototype = {
         }
     },
     remove: function (object, cb) {
+        if (this.debug) console.log("In MySQLTable2: remove");        
         var self = this;
 
         var strSQL = "delete from " + self.tableName;
@@ -200,6 +210,7 @@ MySQLTable2.prototype = {
         self.runCUDQuery(strSQL, cb);
     },
     count: function (object, cb) {
+        if (this.debug) console.log("In MySQLTable2: count");        
         var self = this;
 
         var strSQL = "select count(*) nasir from " + self.tableName;
@@ -215,6 +226,7 @@ MySQLTable2.prototype = {
         self.runQuery(strSQL, cb);
     },
     getIdObject: function (obj) {
+        if (this.debug) console.log("In MySQLTable2: getIdObject");        
         var retObj = {};
         this.idFields.forEach(function (idField) {
             retObj[idField] = obj[idField]
@@ -222,6 +234,7 @@ MySQLTable2.prototype = {
         return retObj;
     },
     getIdObjectWithOperators: function (obj) {
+        if (this.debug) console.log("In MySQLTable2: getIdObjectWithOperators");        
         var retObj = {};
         this.idFields.forEach(function (idField) {
             retObj[idField] = "='" + obj[idField] + "'";
@@ -229,6 +242,7 @@ MySQLTable2.prototype = {
         return retObj;
     },
     isNullIdField: function (obj, cb) {
+        if (this.debug) console.log("In MySQLTable2: isNullIdField");        
         var self = this;
         if (!obj) return true;
         var count = 0;
@@ -249,29 +263,28 @@ MySQLTable2.prototype = {
         });
     },
     exists: function (object, cb) {
+        if (this.debug) console.log("In MySQLTable2: exists");        
         var self = this;
+
         if (!object) {
             return cb(null, false);
         }
         self.isNullIdField(object, function (err, isNull) {
             if (!isNull) {
-                self.count(self.getIdObjectWithOperators(object), function (err, result) {
+                self.findOne(object, function (err, result) {
                     if (err) {
                         return cb(err, null);
                     } else {
-                        if (result[0]['nasir'] > 0) {
-                            return cb(null, true);
-                        } else {
-                            return cb(null, false);
-                        }
+                        return cb(null, result);
                     }
                 });
             } else {
-                return cb(null, false);
+                return cb(null, null);
             }
         });
     },
     getName: function (obj, cb) {
+        if (this.debug) console.log("In MySQLTable2: getName");        
         var self = this;
 
         var strSQL = "select name from " + self.tableName + " where " + self.getIdWhereClause(obj)

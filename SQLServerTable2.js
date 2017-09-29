@@ -146,12 +146,13 @@ SQLServerTable2.prototype = {
     updateWithCompare: function (originalObj, newObj, cb) {
         if (this.debug) console.log("In SQLServerTable2: updateWithCompare");        
         var self = this;
+
         var x = 0;
         var strSQL = "update " + self.tableName + " set ";
         //var tempObj = self.mergeObjects(originalObj, newObj);
 
         for (var key in originalObj) {
-            if (self.isIdField(key)) { //Nothing to do with ID Fields
+            if (self.isIdField(key)) {
                 continue;
             }
             //DON'T JUDGE ME
@@ -180,9 +181,7 @@ SQLServerTable2.prototype = {
                         strSQL += key + " = '" + newObj[key] + "' ";
                     }
                 }
-            } else if (!originalObj[key] && !newObj[key]){ //if neither exists then bail
-                continue;
-            }else { // One of them is null
+            } else { // One of them is null
                 if (x++ > 0) {
                     strSQL += ",";
                 }
@@ -193,7 +192,6 @@ SQLServerTable2.prototype = {
                 }
             }
         }
-
         strSQL += " where " + self.getIdWhereClause(originalObj);
         if (x < 1) { //Nothing to update, bailing
             return cb(null, originalObj);
@@ -273,19 +271,15 @@ SQLServerTable2.prototype = {
         }
         self.isNullIdField(object, function (err, isNull) {
             if (!isNull) {
-                self.count(self.getIdObjectWithOperators(object), function (err, result) {
+                self.findOne(object, function (err, result) {
                     if (err) {
                         return cb(err, null);
                     } else {
-                        if (result && result.length && result.length > 0 && result[0]['nasir'] > 0) {
-                            return cb(null, true);
-                        } else {
-                            return cb(null, false);
-                        }
+                        return cb(null, result);
                     }
                 });
             } else {
-                return cb(null, false);
+                return cb(null, null);
             }
         });
     },
