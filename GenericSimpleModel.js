@@ -11,6 +11,7 @@ var GenericSimpleModel = function (table, debug) {
     this.convertBooToInt = true;
     this.hasCreateAndUpdate = false;    
     this.debug = false;
+    this.user = 'SYSTEM';
 };
 
 GenericSimpleModel.prototype = {
@@ -70,9 +71,9 @@ GenericSimpleModel.prototype = {
                 }
             }
         }
-        if (Model.hasCreateAndUpdate) {
+        if (self.hasCreateAndUpdate) {
             data.updated_on = new Date();
-            data.updated_by = Model.user;
+            data.updated_by = self.user;
         }        
         self.Table.update(data, function (err3, results) {
             if (err3) {
@@ -97,9 +98,9 @@ GenericSimpleModel.prototype = {
                 }
             }
         }
-        if (Model.hasCreateAndUpdate) {
+        if (self.hasCreateAndUpdate) {
             data.updated_on = new Date();
-            data.updated_by = Model.user;
+            data.updated_by = self.user;
         }        
         self.exists(data, function (err1, results) {
             if (err1 || !results || results.length < 1) {
@@ -129,9 +130,9 @@ GenericSimpleModel.prototype = {
                 }
             }
         }
-        if (Model.hasCreateAndUpdate) {
+        if (self.hasCreateAndUpdate) {
             data.updated_on = new Date();
-            data.updated_by = Model.user;
+            data.updated_by = self.user;
         }        
         self.Table.updateWithCompare(oldData, newData, function (err3, results) {
             if (err3) {
@@ -169,9 +170,9 @@ GenericSimpleModel.prototype = {
                 }
             }
         }
-        if (Model.hasCreateAndUpdate) {
+        if (self.hasCreateAndUpdate) {
             data.created_on = new Date();
-            data.created_by = Model.user;
+            data.created_by = self.user;
         }
         self.Table.insert(data, function (err2, results) {
             if (err2) {
