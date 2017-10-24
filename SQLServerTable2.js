@@ -196,7 +196,14 @@ SQLServerTable2.prototype = {
         if (x < 1) { //Nothing to update, bailing
             return cb(null, originalObj);
         } else {
-            self.runCUDQuery(strSQL, cb);
+            //SQL Server doesn't return the new item back from DB, so...
+            self.runCUDQuery(strSQL, function(err, result){
+                if (err){
+                    cb(err);
+                }else{
+                    cb(null, newObj);
+                }
+            });
         }
     },
     remove: function (object, cb) {
@@ -350,6 +357,8 @@ SQLServerTable2.prototype = {
                 }
                 //return cb(err + "\n SQL Statement: " + sqlstring);
             } else {
+                console.log("In CUD Query");
+                //console.dir(recordset);
                 return cb(null, recordset);
             }
         });
