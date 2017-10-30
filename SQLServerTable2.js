@@ -357,8 +357,6 @@ SQLServerTable2.prototype = {
                 }
                 //return cb(err + "\n SQL Statement: " + sqlstring);
             } else {
-                console.log("In CUD Query");
-                //console.dir(recordset);
                 return cb(null, recordset);
             }
         });
