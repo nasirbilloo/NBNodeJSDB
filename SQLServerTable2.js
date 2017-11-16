@@ -2,12 +2,13 @@
 
 var sql = require('mssql');
 
-var SQLServerTable2 = function (strTable, idFields, dbConn) {
+var SQLServerTable2 = function (strTable, idFields, dontUpdate, dbConn) {
     this.tableName = strTable;
     this.userID = 'SYS';
     idFields ? this.idFields = idFields : this.idFields = ['id']; //Array
     this.dbConn = dbConn;
     this.debug = false;
+    this.dontUpdate = dontUpdate;    
 };
 
 SQLServerTable2.prototype = {
@@ -143,6 +144,14 @@ SQLServerTable2.prototype = {
         strSQL += " where " + self.getIdWhereClause(object);
         self.runCUDQuery(strSQL, cb);
     },
+    inDontUpdate: function(colName){
+        for (var x=0; x<dontUpdate.length; x++){
+            if (colName == dontUpdate[x]){
+                return true;
+            }
+        }
+        return false;
+    },    
     updateWithCompare: function (originalObj, newObj, cb) {
         if (this.debug) console.log("In SQLServerTable2: updateWithCompare");        
         var self = this;
@@ -158,10 +167,8 @@ SQLServerTable2.prototype = {
             //DON'T JUDGE ME
             //I must have done this in my lowest, most vulnerable state
             //Seriously, don't judge me.
-            if (self.tableName.toLowerCase() == "people") {
-                if (key.toLowerCase() == "departmentid" || key.toLowerCase() == "manager" || key.toLowerCase() == "authorized") {
-                    continue;
-                }
+            if (inDontUpdate(key.toLowerCase())){
+                continue;
             }
             /*
                 if newObj[key] is null, set the originalObj[key] to null

@@ -4,7 +4,6 @@
 var DBConnectionFactory = require('./DBConnectionFactory');
 
 var GenericSimpleModel = function (table, debug) {
-    //this.strTable = table;
     this.Table = table;
     this.tableName = table.tableName;
     this.retID = false;
