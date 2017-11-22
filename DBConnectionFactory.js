@@ -93,7 +93,32 @@ DBConnectionFactory.prototype = {
             }
         }
     },
-    getSQLTable: function (tableName, idFields, doNotUpdateFields, cb) {
+    getSQLTable: function (tableName, idFields, cb) {
+        if (this.debug) console.log("In DBConnectionFactory: getSQLTable");        
+        var self = this;
+        var table = null;
+        var SQLTableType = null;
+        if (!self.dbConn) {
+            return cb("DBConnectionFactory - getSQLTable: \nInvalid Connection");
+        } else {
+            if (self.connObj.DBTYPE == self.DBTypes.MySQL) {
+                SQLTableType = MySQLTable2;
+            } else if (self.connObj.DBTYPE == self.DBTypes.SQLServer) {
+                SQLTableType = SQLServerTable2;
+            } else {
+                return cb("DBConnectionFactory - getSQLTable: \nInvalid DB Type")
+            }
+            self.getConnection(function (err, conn) {
+                if (err) {
+                    return cb(err);
+                } else {
+                    table = new SQLTableType(tableName, idFields, null, conn);
+                    return cb(null, table);
+                }
+            });
+        }
+    },
+    getSQLTable2: function (tableName, idFields, doNotUpdateFields, cb) {
         if (this.debug) console.log("In DBConnectionFactory: getSQLTable");        
         var self = this;
         var table = null;
@@ -117,7 +142,7 @@ DBConnectionFactory.prototype = {
                 }
             });
         }
-    },
+    },    
     getSQLQuery: function (cb) {
         if (this.debug) console.log("In DBConnectionFactory: getSQLQuery");        
         var self = this;
@@ -159,6 +184,23 @@ DBConnectionFactory.prototype = {
                 });
             }
         });
+    },
+    getSQLModel2: function (tableName, idFields, cb) {
+        if (this.debug) console.log("In DBConnectionFactory: getSQLModel");        
+        var self = this;
+        var model = null;
+        if (!self.dbConn) {
+            return cb("DBConnectionFactory - getSQLModel: \nInvalid Connection");
+        } else {
+            self.getSQLTable2(tableName, idFields, function (err, table) {
+                if (err) {
+                    return cb(err);
+                } else {
+                    var model = new GenericSimpleModel(table);
+                    return cb(null, model);
+                }
+            });
+        }
     },
     getSQLModel: function (tableName, idFields, doNotUpdateFields, cb) {
         if (this.debug) console.log("In DBConnectionFactory: getSQLModel");        
