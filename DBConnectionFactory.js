@@ -185,14 +185,14 @@ DBConnectionFactory.prototype = {
             }
         });
     },
-    getSQLModel2: function (tableName, idFields, cb) {
+    getSQLModel2: function (tableName, idFields, doNotUpdateFields, cb) {
         if (this.debug) console.log("In DBConnectionFactory: getSQLModel");        
         var self = this;
         var model = null;
         if (!self.dbConn) {
             return cb("DBConnectionFactory - getSQLModel: \nInvalid Connection");
         } else {
-            self.getSQLTable2(tableName, idFields, function (err, table) {
+            self.getSQLTable2(tableName, idFields, doNotUpdateFields, function (err, table) {
                 if (err) {
                     return cb(err);
                 } else {
@@ -202,14 +202,14 @@ DBConnectionFactory.prototype = {
             });
         }
     },
-    getSQLModel: function (tableName, idFields, doNotUpdateFields, cb) {
+    getSQLModel: function (tableName, idFields, cb) {
         if (this.debug) console.log("In DBConnectionFactory: getSQLModel");        
         var self = this;
         var model = null;
         if (!self.dbConn) {
             return cb("DBConnectionFactory - getSQLModel: \nInvalid Connection");
         } else {
-            self.getSQLTable(tableName, idFields, doNotUpdateFields, function (err, table) {
+            self.getSQLTable(tableName, idFields, function (err, table) {
                 if (err) {
                     return cb(err);
                 } else {
