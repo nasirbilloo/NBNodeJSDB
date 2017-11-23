@@ -131,6 +131,9 @@ MySQLTable2.prototype = {
             if (self.isIdField(key)) {
                 continue;
             }
+            if (self.inDontUpdate(key.toLowerCase())){
+                continue;
+            }
             if (x++ > 0) {
                 strSQL += ","
             }
@@ -145,8 +148,14 @@ MySQLTable2.prototype = {
         self.runCUDQuery(strSQL, cb);
     },
     inDontUpdate: function(colName){
-        for (var x=0; x<dontUpdate.length; x++){
-            if (colName == dontUpdate[x]){
+        if (!this.dontUpdate){
+            return false;
+        }
+        if (this.dontUpdate.length < 1){
+            return;
+        }
+        for (var x=0; x<this.dontUpdate.length; x++){
+            if (colName == this.dontUpdate[x]){
                 return true;
             }
         }
@@ -167,7 +176,7 @@ MySQLTable2.prototype = {
             //DON'T JUDGE ME
             //I must have done this in my lowest, most vulnerable state
             //Seriously, don't judge me.
-            if (inDontUpdate(key.toLowerCase())){
+            if (self.inDontUpdate(key.toLowerCase())){
                 continue;
             }
             /*
